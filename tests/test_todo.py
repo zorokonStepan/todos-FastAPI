@@ -40,3 +40,21 @@ class TestTodo:
         response = self.__request(url=f"{self.start_url}/todo")
         assert len(response['todos']) == 1
         assert response['todos'] == [{'id': 1, 'item': 'First Todo is to finish this book!'}]
+
+    def test_get_single_todo(self):
+        data_1 = {"id": 1, "item": "First Todo is to finish this book!"}
+        response = self.__request(url=f"{self.start_url}/todo", method="POST", json_data=data_1)
+        assert response['message'] == 'TODO added successfully'
+
+        data_2 = {"id": 2, "item": "Second Todo is to finish this book!"}
+        response = self.__request(url=f"{self.start_url}/todo", method="POST", json_data=data_2)
+        assert response['message'] == 'TODO added successfully'
+
+        response = self.__request(url=f"{self.start_url}/todo/1")
+        assert response['todo'] == data_1
+
+        response = self.__request(url=f"{self.start_url}/todo/2")
+        assert response['todo'] == data_2
+
+        response = self.__request(url=f"{self.start_url}/todo/3")
+        assert response['message'] == "Todo with supplied ID doesn't exist."
