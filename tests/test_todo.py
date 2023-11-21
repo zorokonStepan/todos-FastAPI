@@ -39,7 +39,7 @@ class TestTodo:
 
         response = self.__request(url=self.todo_url)
         assert len(response['todos']) == 1
-        assert response['todos'] == [{'id': 1, 'item': 'First Todo is to finish this book!'}]
+        assert response['todos'] == [{'item': 'First Todo is to finish this book!'}]
 
     def test_get_single_todo(self):
         data_1, data_2 = self.insert_data()
