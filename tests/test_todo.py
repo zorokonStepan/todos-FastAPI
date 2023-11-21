@@ -7,8 +7,7 @@ class TestTodo:
     RESPONSE_TIMEOUT = 5
 
     todo_url = f"{HOST_URL}/todo"
-    get_todo_item_url = lambda self, item: f"{HOST_URL}/todo/{item}"
-    update_todo_item_url = lambda self, item: f"{HOST_URL}/todo/{item}"
+    todo_item_url = lambda self, item: f"{HOST_URL}/todo/{item}"
 
     @classmethod
     def __request(cls, url, method="GET", json_data=None):
@@ -45,13 +44,12 @@ class TestTodo:
     def test_get_single_todo(self):
         data_1, data_2 = self.insert_data()
 
-        response = self.__request(url=self.get_todo_item_url(1))
+        response = self.__request(url=self.todo_item_url(1))
         assert response['todo'] == data_1
-
-        response = self.__request(url=self.get_todo_item_url(2))
+        response = self.__request(url=self.todo_item_url(2))
         assert response['todo'] == data_2
 
-        response = self.__request(url=self.get_todo_item_url(3))
+        response = self.__request(url=self.todo_item_url(3))
         assert response['message'] == "Todo with supplied ID doesn't exist."
 
     def test_update_todo(self):
@@ -61,17 +59,54 @@ class TestTodo:
         data_2 = {"id": 2, "item": "Second Todo UPDATED!"}
         data_3 = {"id": 3, "item": "Third Todo UPDATED!"}
 
-        response = self.__request(url=self.update_todo_item_url(1), method="PUT", json_data=data_1)
+        response = self.__request(url=self.todo_item_url(1), method="PUT", json_data=data_1)
         assert response['message'] == "Todo updated successfully."
-        response = self.__request(url=self.get_todo_item_url(1))
+        response = self.__request(url=self.todo_item_url(1))
         assert response['todo'] == data_1
 
-        response = self.__request(url=self.update_todo_item_url(2), method="PUT", json_data=data_2)
+        response = self.__request(url=self.todo_item_url(2), method="PUT", json_data=data_2)
         assert response['message'] == "Todo updated successfully."
-        response = self.__request(url=self.get_todo_item_url(2))
+        response = self.__request(url=self.todo_item_url(2))
         assert response['todo'] == data_2
 
-        response = self.__request(url=self.update_todo_item_url(3), method="PUT", json_data=data_3)
+        response = self.__request(url=self.todo_item_url(3), method="PUT", json_data=data_3)
+        assert response['message'] == "Todo with supplied ID doesn't exist."
+
+        self.__request(url=self.todo_url, method="DELETE")
+
+    def test_delete_single_todo(self):
+        data_1, data_2 = self.insert_data()
+
+        response = self.__request(url=self.todo_item_url(1))
+        assert response['todo'] == data_1
+        response = self.__request(url=self.todo_item_url(2))
+        assert response['todo'] == data_2
+
+        response = self.__request(url=self.todo_item_url(1), method="DELETE")
+        assert response['message'] == "Todo deleted successfully."
+
+        response = self.__request(url=self.todo_item_url(1))
+        assert response['message'] == "Todo with supplied ID doesn't exist."
+        response = self.__request(url=self.todo_item_url(2))
+        assert response['todo'] == data_2
+
+        response = self.__request(url=self.todo_item_url(1), method="DELETE")
+        assert response['message'] == "Todo with supplied ID doesn't exist."
+
+    def test_delete_all_todo(self):
+        data_1, data_2 = self.insert_data()
+
+        response = self.__request(url=self.todo_item_url(1))
+        assert response['todo'] == data_1
+        response = self.__request(url=self.todo_item_url(2))
+        assert response['todo'] == data_2
+
+        response = self.__request(url=self.todo_url, method="DELETE")
+        assert response['message'] == "Todos deleted successfully."
+
+        response = self.__request(url=self.todo_item_url(1))
+        assert response['message'] == "Todo with supplied ID doesn't exist."
+        response = self.__request(url=self.todo_item_url(2))
         assert response['message'] == "Todo with supplied ID doesn't exist."
 
     def insert_data(self):
@@ -80,5 +115,7 @@ class TestTodo:
         self.__request(url=self.todo_url, method="POST", json_data=data_1)
         self.__request(url=self.todo_url, method="POST", json_data=data_2)
         return data_1, data_2
+
+
 
 
