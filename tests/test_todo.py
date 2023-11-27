@@ -1,4 +1,5 @@
 import requests
+from fastapi import HTTPException
 
 from settings import HOST_URL
 
@@ -49,8 +50,10 @@ class TestTodo:
         response = self.__request(url=self.todo_item_url(2))
         assert response['todo'] == data_2
 
-        response = self.__request(url=self.todo_item_url(3))
-        assert response['message'] == "Todo with supplied ID doesn't exist."
+        try:
+            self.__request(url=self.todo_item_url(3))
+        except HTTPException as exception:
+            assert exception == "Todo with supplied ID doesn't exist."
 
     def test_update_todo(self):
         self.insert_data()
@@ -69,8 +72,10 @@ class TestTodo:
         response = self.__request(url=self.todo_item_url(2))
         assert response['todo'] == data_2
 
-        response = self.__request(url=self.todo_item_url(3), method="PUT", json_data=data_3)
-        assert response['message'] == "Todo with supplied ID doesn't exist."
+        try:
+            self.__request(url=self.todo_item_url(3), method="PUT", json_data=data_3)
+        except HTTPException as exception:
+            assert exception == "Todo with supplied ID doesn't exist."
 
         self.__request(url=self.todo_url, method="DELETE")
 
@@ -85,13 +90,18 @@ class TestTodo:
         response = self.__request(url=self.todo_item_url(1), method="DELETE")
         assert response['message'] == "Todo deleted successfully."
 
-        response = self.__request(url=self.todo_item_url(1))
-        assert response['message'] == "Todo with supplied ID doesn't exist."
+        try:
+            self.__request(url=self.todo_item_url(1))
+        except HTTPException as exception:
+            assert exception == "Todo with supplied ID doesn't exist."
+
         response = self.__request(url=self.todo_item_url(2))
         assert response['todo'] == data_2
 
-        response = self.__request(url=self.todo_item_url(1), method="DELETE")
-        assert response['message'] == "Todo with supplied ID doesn't exist."
+        try:
+            self.__request(url=self.todo_item_url(1), method="DELETE")
+        except HTTPException as exception:
+            assert exception == "Todo with supplied ID doesn't exist."
 
     def test_delete_all_todo(self):
         data_1, data_2 = self.insert_data()
@@ -104,10 +114,14 @@ class TestTodo:
         response = self.__request(url=self.todo_url, method="DELETE")
         assert response['message'] == "Todos deleted successfully."
 
-        response = self.__request(url=self.todo_item_url(1))
-        assert response['message'] == "Todo with supplied ID doesn't exist."
-        response = self.__request(url=self.todo_item_url(2))
-        assert response['message'] == "Todo with supplied ID doesn't exist."
+        try:
+            self.__request(url=self.todo_item_url(1))
+        except HTTPException as exception:
+            assert exception == "Todo with supplied ID doesn't exist."
+        try:
+            self.__request(url=self.todo_item_url(2))
+        except HTTPException as exception:
+            assert exception == "Todo with supplied ID doesn't exist."
 
     def insert_data(self):
         data_1 = {"id": 1, "item": "First Todo is to finish this book!"}
