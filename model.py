@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 
 class Todo(BaseModel):
-    id:   Optional[int]
+    id:   Optional[int] = 0
     item: str
 
     @classmethod
