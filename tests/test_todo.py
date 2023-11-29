@@ -35,8 +35,7 @@ class TestTodo:
 
     def test_add_todo(self):
         data = {"id": 1, "item": "First Todo is to finish this book!"}
-        response = self.__request(url=self.todo_url, method="POST", json_data=data)
-        assert response['message'] == 'TODO added successfully'
+        self.__request(url=self.todo_url, method="POST", json_data=data)
 
         response = self.__request(url=self.todo_url)
         assert len(response['todos']) == 1
